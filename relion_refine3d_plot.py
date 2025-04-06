@@ -171,7 +171,7 @@ def main():
     assert model_star_fpath.exists(), f"Model star file {model_star_fpath} does not exist."
     model_dict = starfile.read(model_star_fpath)
     fsc_resolution = model_dict["model_general"]["rlnCurrentResolution"]
-    print(f"FSC resolution = {fsc_resolution} Å")
+    print(f"{job_name}: FSC resolution = {fsc_resolution} Å")
     
     # Plot map slices
     fig_slices, _ = plot_map_slices(filtered_maps, NUM_CLASSES, MAP_SHAPE)
