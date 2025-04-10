@@ -149,6 +149,8 @@ def main():
     # Get job info
     job_type = job_dir.parent.stem
     job_name = job_dir.stem
+
+    # Get iteration:
     
     # Find filtered maps
     map_glob = f"run_it{args.iteration}_class00?.mrc"
@@ -170,12 +172,14 @@ def main():
     model_star_fpath = job_dir / Path(f"run_it{args.iteration}_model.star")
     assert model_star_fpath.exists(), f"Model star file {model_star_fpath} does not exist."
     model_dict = starfile.read(model_star_fpath)
-    fsc_resolution = model_dict["model_general"]["rlnCurrentResolution"]
-    print(f"{job_name}: FSC resolution = {fsc_resolution} Å")
+    print(model_dict["model_general"])
+    print(type(model_dict["model_general"]))
+    est_resolution = model_dict["model_general"].loc[0,"rlnCurrentResolution"]
+    print(f"{job_name}: FSC resolution = {est_resolution} Å")
     
     # Plot map slices
     fig_slices, _ = plot_map_slices(filtered_maps, NUM_CLASSES, MAP_SHAPE)
-    title = f"Map(s) of {job_type}/{job_name} ({fsc_resolution:.2f} Å)"
+    title = f"Map(s) of {job_type}/{job_name} It. {args.iteration} ({est_resolution:.2f} Å)"
     fig_slices.suptitle(title)
     plt.tight_layout()
     
@@ -192,7 +196,7 @@ def main():
         degrees=True,
         log_scale=args.log_scale,
         bins=args.bins,
-        title=f"Orientation Distribution - {job_type}/{job_name}"
+        title=f"Orientation Distribution - {job_type}/{job_name} It. {args.iteration}"
     )
 
     
