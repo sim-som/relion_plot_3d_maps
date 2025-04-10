@@ -119,7 +119,7 @@ def parse_arguments():
     
     parser.add_argument('--job_dir', type=str, required=True,
                         help='Path to the Relion job directory')
-    parser.add_argument("--iteration", "-i", default="-1", type=str)
+    parser.add_argument("--iteration", "-i", default=-1, type=int)
     parser.add_argument('--output_dir', type=str, default=None,
                         help='Directory to save output files (defaults to job_dir)')
     parser.add_argument('--bins', type=int, default=36,
@@ -151,6 +151,21 @@ def main():
     job_name = job_dir.stem
 
     # Get iteration:
+    if args.iteration < 0:
+        iterations = sorted(job_dir.glob("run_it*_model.star"))
+        assert iterations, f"No iterations found in {job_dir}."
+        args.iteration = iterations[-1].stem.split("_")[1][2:]
+    elif args.iteration < 10:
+        args.iteration = f"00{args.iteration}"
+    elif args.iteration < 100:
+        args.iteration = f"0{args.iteration}"
+    elif args.iteration < 1000:
+        args.iteration = str(args.iteration)
+    else:
+        raise ValueError("Iteration number exceeds 999, which is not supported.")
+    
+    
+    print(f"Iteration: {args.iteration}")
     
     # Find filtered maps
     map_glob = f"run_it{args.iteration}_class00?.mrc"
@@ -172,14 +187,22 @@ def main():
     model_star_fpath = job_dir / Path(f"run_it{args.iteration}_model.star")
     assert model_star_fpath.exists(), f"Model star file {model_star_fpath} does not exist."
     model_dict = starfile.read(model_star_fpath)
-    print(model_dict["model_general"])
-    print(type(model_dict["model_general"]))
+
     est_resolution = model_dict["model_general"].loc[0,"rlnCurrentResolution"]
     print(f"{job_name}: FSC resolution = {est_resolution} Å")
+
+    # Load sampling data:
+    sampling_star_fpath = job_dir / Path(f"run_it{args.iteration}_sampling.star")
+    assert particles_star_fpath.exists(), f"No sampling data! sampling star file {sampling_star_fpath} does not exist."
+    sampling_data = starfile.read(sampling_star_fpath)["sampling_general"]
+    healpix_order = sampling_data.loc[0, "rlnHealpixOrder"]
+    print(f"healpix: {healpix_order}, Type: {type(healpix_order)}")
+    
+    
     
     # Plot map slices
     fig_slices, _ = plot_map_slices(filtered_maps, NUM_CLASSES, MAP_SHAPE)
-    title = f"Map(s) of {job_type}/{job_name} It. {args.iteration} ({est_resolution:.2f} Å)"
+    title = f"Map(s) of {job_type}/{job_name} It. {args.iteration} ({est_resolution:.2f} Å) "
     fig_slices.suptitle(title)
     plt.tight_layout()
     
@@ -196,7 +219,7 @@ def main():
         degrees=True,
         log_scale=args.log_scale,
         bins=args.bins,
-        title=f"Orientation Distribution - {job_type}/{job_name} It. {args.iteration}"
+        title=f"Orientation Distribution - {job_type}/{job_name} It. {args.iteration} (hp{healpix_order})"
     )
 
     
