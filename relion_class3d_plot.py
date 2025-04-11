@@ -188,14 +188,14 @@ def main():
     assert model_star_fpath.exists(), f"Model star file {model_star_fpath} does not exist."
     model_dict = starfile.read(model_star_fpath)
 
-    est_resolution = model_dict["model_general"].loc[0,"rlnCurrentResolution"]
+    est_resolution = model_dict["model_general"]["rlnCurrentResolution"]
     print(f"{job_name}: FSC resolution = {est_resolution} Å")
 
     # Load sampling data:
     sampling_star_fpath = job_dir / Path(f"run_it{args.iteration}_sampling.star")
     assert particles_star_fpath.exists(), f"No sampling data! sampling star file {sampling_star_fpath} does not exist."
     sampling_data = starfile.read(sampling_star_fpath)["sampling_general"]
-    healpix_order = sampling_data.loc[0, "rlnHealpixOrder"]
+    healpix_order = sampling_data["rlnHealpixOrder"]
     print(f"healpix: {healpix_order}, Type: {type(healpix_order)}")
     
     
