@@ -205,6 +205,8 @@ def main():
     title = f"Map(s) of {job_type}/{job_name} It. {args.iteration} ({est_resolution:.2f} Å) "
     fig_slices.suptitle(title)
     plt.tight_layout()
+
+    fig_slices.canvas.manager.set_window_title(f"Maps {job_type}/{job_name} It. {args.iteration}")
     
     if args.save_plots:
         slices_output = output_dir / f"{job_type}_{job_name}_map_slices.png"
@@ -221,6 +223,8 @@ def main():
         bins=args.bins,
         title=f"Orientation Distribution - {job_type}/{job_name} It. {args.iteration} (hp{healpix_order})"
     )
+
+    fig_orient.canvas.manager.set_window_title(f"Angles {job_type}/{job_name} It. {args.iteration}")
 
     
     if args.save_plots:
