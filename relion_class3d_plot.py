@@ -209,7 +209,7 @@ def main():
     fig_slices.canvas.manager.set_window_title(f"Maps {job_type}/{job_name} It. {args.iteration}")
     
     if args.save_plots:
-        slices_output = output_dir / f"{job_type}_{job_name}_map_slices.png"
+        slices_output = output_dir / f"{job_type}_{job_name}_map_slices_it{args.iteration}.png"
         fig_slices.savefig(slices_output, dpi=300, bbox_inches='tight')
         print(f"Saved map slices to {slices_output}")
     
@@ -228,7 +228,7 @@ def main():
 
     
     if args.save_plots:
-        orient_output = output_dir / f"{job_type}_{job_name}_orientation_histogram.png"
+        orient_output = output_dir / f"{job_type}_{job_name}_orientation_histogram_it{args.iteration}.png"
         fig_orient.savefig(orient_output, dpi=300, bbox_inches='tight')
         print(f"Saved orientation histogram to {orient_output}")
     
